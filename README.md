@@ -1,26 +1,25 @@
 # TB-Rename-Files
 
-A small command-line helper that renames Toniebox `.taf` files based on a CSV mapping.
+A small command-line helper that renames Toniebox `.taf` files based on a CSV
+mapping or simply by their folder ids.
 
 ## Requirements
 
-* Python 3.8 or newer
+* Python 3.9 or newer
 
 ## Installation
 
-Clone the repository and make the script executable:
+Install the package in editable mode so that the `td-rename` command becomes
+available:
 
 ```bash
 git clone <repository-url>
 cd TB-Rename-Files
-chmod +x rename_files.py
+pip install -e .
 ```
 
-Alternatively, call the script through the Python interpreter without changing permissions:
-
-```bash
-python3 rename_files.py --help
-```
+You can still invoke the legacy script directly with `python rename_files.py`,
+but the recommended workflow is to use the installed CLI entry point.
 
 ## Preparing the input data
 
@@ -34,14 +33,16 @@ python3 rename_files.py --help
 
 ## Usage
 
-```
-./rename_files.py <input_dir> <mapping.csv> <output_dir>
+### Rename using metadata
+
+```bash
+td-rename from-csv <input_dir> <mapping.csv> <output_dir>
 ```
 
 For example:
 
 ```bash
-./rename_files.py ~/toniebox/input tonies.csv ~/toniebox/output
+td-rename from-csv ~/toniebox/input tonies.csv ~/toniebox/output
 ```
 
 This command copies each file from `~/toniebox/input/<id>/` into the flat
@@ -49,14 +50,26 @@ output directory `~/toniebox/output`. When metadata is available, files are
 renamed to `<Series> - <Episode>.taf`. Files without metadata are moved to the
 `unmatched/` subdirectory and keep their original ID as the filename.
 
+### Rename using folder ids
+
+```bash
+td-rename with-id <input_dir> <output_dir>
+```
+
+This mode simply copies each file from `<input_dir>/<id>/` to `<output_dir>` and
+renames it to `<id>.taf`. Use it when you only need to normalise file names
+without relying on a CSV mapping.
+
 ### Dry-run / limiting the run
 
 Use the `--test` flag to process only the first *N* folders. This is useful to
-validate the workflow on a small subset:
+validate the workflow on a small subset, for example:
 
 ```bash
-./rename_files.py ~/toniebox/input tonies.csv ~/toniebox/output --test 5
+td-rename with-id ~/toniebox/input ~/toniebox/output --test 2
 ```
+
+The flag is also available for the `from-csv` command.
 
 ## Tips
 
